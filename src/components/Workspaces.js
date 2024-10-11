@@ -5,7 +5,7 @@ import Projects from './Projects';
 function Workspaces() {
   const [workspaces, setWorkspaces] = useState([]);
   const [workspaceName, setWorkspaceName] = useState('');
-  const [expandedWorkspaceId, setExpandedWorkspaceId] = useState(null);
+  const [selectedWorkspaceId, setSelectedWorkspaceId] = useState(null);
 
   useEffect(() => {
     fetchWorkspaces();
@@ -22,46 +22,46 @@ function Workspaces() {
 
   const handleCreateWorkspace = async (e) => {
     e.preventDefault();
-    
     try {
-      const response = await axios.post('http://localhost:5000/api/workspaces', { name: workspaceName });
-      setWorkspaces([...workspaces, response.data]);
+      await axios.post('http://localhost:5000/api/workspaces', { name: workspaceName });
       setWorkspaceName('');
-      alert('Workspace created successfully!');
+      fetchWorkspaces();
     } catch (error) {
-      alert(error.response?.data?.message || 'Error creating workspace');
+      console.error('Error creating workspace:', error);
     }
   };
 
-  const toggleProjects = (workspaceId) => {
-    setExpandedWorkspaceId(expandedWorkspaceId === workspaceId ? null : workspaceId);
+  const toggleWorkspace = (workspaceId) => {
+    setSelectedWorkspaceId(selectedWorkspaceId === workspaceId ? null : workspaceId);
   };
 
   return (
     <div>
-      <h2>My Workspaces</h2>
-      <form onSubmit={handleCreateWorkspace}>
-        <input 
-          type="text" 
-          placeholder="New Workspace Name" 
-          value={workspaceName} 
-          onChange={(e) => setWorkspaceName(e.target.value)} 
-          required 
-        />
-        <button type="submit">Create Workspace</button>
-      </form>
-
-      <ul>
+      <div className="header">
+        <h2>Workspaces</h2>
+        <form onSubmit={handleCreateWorkspace}>
+          <input 
+            type="text" 
+            placeholder="New Workspace Name" 
+            value={workspaceName} 
+            onChange={(e) => setWorkspaceName(e.target.value)} 
+            required 
+          />
+          <button type="submit">Create Workspace</button>
+        </form>
+      </div>
+      <div className="workspace-list">
         {workspaces.map(ws => (
-          <li key={ws.id}>
-            {ws.name} - Members: {ws.members.join(', ')}
-            <button onClick={() => toggleProjects(ws.id)}>
-              {expandedWorkspaceId === ws.id ? 'Hide Projects' : 'Show Projects'}
+          <div key={ws.id} className="workspace-item">
+            <h3>{ws.name}</h3>
+            <p>Members: {ws.members.join(', ')}</p>
+            <button onClick={() => toggleWorkspace(ws.id)}>
+              {selectedWorkspaceId === ws.id ? 'Hide Projects' : 'Show Projects'}
             </button>
-            {expandedWorkspaceId === ws.id && <Projects workspaceId={ws.id} />}
-          </li>
+            {selectedWorkspaceId === ws.id && <Projects workspaceId={ws.id} />}
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   );
 }

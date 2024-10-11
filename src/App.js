@@ -5,28 +5,24 @@ import TaskList from './components/TaskList';
 import Register from './components/Register';
 import Login from './components/Login';
 import Workspaces from './components/Workspaces';
+import Inbox from './components/Inbox';
+import Sidebar from './components/Sidebar';
 
 function App() {
   return (
     <Router>
-      <div className="App">
-        <nav>
-          <ul>
-            <li><Link to="/">Home</Link></li>
-            <li><Link to="/tasks">Tasks</Link></li>
-            <li><Link to="/register">Register</Link></li>
-            <li><Link to="/login">Login</Link></li>
-            <li><Link to="/workspaces">Workspaces</Link></li>
-          </ul>
-        </nav>
-
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/tasks" element={<TaskList />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/workspaces" element={<Workspaces />} />
-        </Routes>
+      <div className="app-container">
+        <Sidebar />
+        <main className="main-content">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/tasks" element={<TaskList />} />
+            <Route path="/inbox" element={<Inbox />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/workspaces" element={<Workspaces />} />
+          </Routes>
+        </main>
       </div>
     </Router>
   );
