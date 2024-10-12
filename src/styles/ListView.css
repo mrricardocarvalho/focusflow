@@ -1,0 +1,73 @@
+.list-view {
+  padding: 20px;
+  background-color: #ffffff;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  text-align: left;
+  padding: 12px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+th {
+  background-color: #f6f8f9;
+  font-weight: 600;
+  color: #6f7782;
+}
+
+tr:hover {
+  background-color: #f6f8f9;
+}
+
+tr.completed {
+  text-decoration: line-through;
+  color: #6f7782;
+}
+
+input[type="checkbox"] {
+  margin-right: 10px;
+}
+
+.new-task-form {
+  display: flex;
+  margin-bottom: 20px;
+}
+
+.new-task-input {
+  flex-grow: 1;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px 0 0 4px;
+}
+
+.new-task-button {
+  padding: 10px 20px;
+  background-color: #14aaf5;
+  color: white;
+  border: none;
+  border-radius: 0 4px 4px 0;
+  cursor: pointer;
+}
+
+.new-task-button:hover {
+  background-color: #008ce3;
+}
+
+.filters {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+}
+
+.filters select {
+  margin-left: 10px;
+  padding: 5px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+}

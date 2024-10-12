@@ -2,7 +2,12 @@ const projects = []; // In-memory storage for projects
 
 // Create a new project
 const createProject = (name, workspaceId) => {
-    const newProject = { id: Date.now(), name, workspaceId: parseInt(workspaceId, 10), tasks: [] };
+    const newProject = { 
+        id: Date.now(), 
+        name, 
+        workspaceId: parseInt(workspaceId, 10), 
+        tasks: [] 
+    };
     projects.push(newProject);
     return newProject;
 };
@@ -21,7 +26,8 @@ const addTaskToProject = (projectId, taskName, dueDate, priorityLevel) => {
             name: taskName, 
             completed: false, 
             dueDate, 
-            priorityLevel
+            priorityLevel,
+            status: 'todo'
         };
         project.tasks.push(newTask);
         return newTask;
@@ -33,6 +39,17 @@ const addTaskToProject = (projectId, taskName, dueDate, priorityLevel) => {
 const getTasksByProject = (projectId) => {
     const project = projects.find(p => p.id === parseInt(projectId, 10));
     return project ? project.tasks : [];
+};
+
+// Get tasks from multiple projects
+const getTasksFromMultipleProjects = (projectIds) => {
+    const tasks = [];
+    projects.forEach(project => {
+        if (projectIds.includes(project.id.toString())) {
+            tasks.push(...project.tasks.map(task => ({...task, projectName: project.name})));
+        }
+    });
+    return tasks;
 };
 
 // Toggle task completion
@@ -88,5 +105,6 @@ module.exports = {
     getTasksByProject, 
     toggleTaskCompletion,
     editTask,
-    deleteTask
+    deleteTask,
+    getTasksFromMultipleProjects
 };

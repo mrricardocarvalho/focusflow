@@ -5,7 +5,17 @@ const jwt = require('jsonwebtoken');
 
 const router = express.Router();
 const users = []; // This will act as our in-memory database for now
+const User = require('../models/User');
 
+router.get('/', async (req, res) => {
+    try {
+      const users = await User.find();
+      res.json(users);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+  
 // Register User
 router.post('/register', async (req, res) => {
     const { username, password } = req.body;

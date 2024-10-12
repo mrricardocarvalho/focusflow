@@ -1,181 +1,90 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import '../styles/Sidebar.css';
 
 function Sidebar() {
   const [projectsExpanded, setProjectsExpanded] = useState(true);
-  const [workspacesExpanded, setWorkspacesExpanded] = useState(true);
-  const [projectsDropdownOpen, setProjectsDropdownOpen] = useState(false);
-  const [workspacesDropdownOpen, setWorkspacesDropdownOpen] = useState(false);
-  const [projects, setProjects] = useState([]);
-  const [workspaces, setWorkspaces] = useState([]);
-  const [projectsSortOption, setProjectsSortOption] = useState('alphabetical');
-  const [workspacesSortOption, setWorkspacesSortOption] = useState('custom');
-
-  const sidebarRef = useRef(null);
-
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
-        setProjectsDropdownOpen(false);
-        setWorkspacesDropdownOpen(false);
-      }
-    }
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+  const [teamsExpanded, setTeamsExpanded] = useState(true);
+  const [favorites] = useState([
+    { id: 1, name: 'Important Project', icon: 'star' },
+    { id: 2, name: 'Urgent Tasks', icon: 'exclamation-circle' }
+  ]);
+  const [projects] = useState([
+    { id: 1, name: 'Marketing Campaign' },
+    { id: 2, name: 'Product Launch' },
+    { id: 3, name: 'Q4 Planning' }
+  ]);
+  const [teams] = useState([
+    { id: 1, name: 'Design Team' },
+    { id: 2, name: 'Development Team' },
+    { id: 3, name: 'Marketing Team' }
+  ]);
 
   const toggleProjects = () => setProjectsExpanded(!projectsExpanded);
-  const toggleWorkspaces = () => setWorkspacesExpanded(!workspacesExpanded);
-
-  const toggleProjectsDropdown = (e) => {
-    e.stopPropagation();
-    setProjectsDropdownOpen(!projectsDropdownOpen);
-  };
-
-  const toggleWorkspacesDropdown = (e) => {
-    e.stopPropagation();
-    setWorkspacesDropdownOpen(!workspacesDropdownOpen);
-  };
-
-  const addProject = (e) => {
-    e.stopPropagation();
-    const projectName = prompt("Enter new project name:");
-    if (projectName) {
-      setProjects([...projects, { id: Date.now(), name: projectName }]);
-      setProjectsExpanded(true);
-      setProjectsDropdownOpen(false);
-    }
-  };
-
-  const addWorkspace = (e) => {
-    e.stopPropagation();
-    const workspaceName = prompt("Enter new workspace name:");
-    if (workspaceName) {
-      setWorkspaces([...workspaces, { id: Date.now(), name: workspaceName }]);
-      setWorkspacesExpanded(true);
-      setWorkspacesDropdownOpen(false);
-    }
-  };
-
-  const handleSortProjects = (option) => {
-    setProjectsSortOption(option);
-    setProjectsDropdownOpen(false);
-    // Here you would add logic to actually sort the projects
-  };
-
-  const handleSortWorkspaces = (option) => {
-    setWorkspacesSortOption(option);
-    setWorkspacesDropdownOpen(false);
-    // Here you would add logic to actually sort the workspaces
-  };
-
-  const getConsistentColor = (id) => {
-    const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8'];
-    return colors[id % colors.length];
-  };
+  const toggleTeams = () => setTeamsExpanded(!teamsExpanded);
 
   return (
-    <aside className="sidebar" ref={sidebarRef}>
+    <aside className="sidebar">
       <h1>FocusFlow</h1>
       <nav>
         <ul>
           <li><Link to="/"><i className="fas fa-home"></i> Home</Link></li>
           <li><Link to="/tasks"><i className="fas fa-tasks"></i> My Tasks</Link></li>
-          <li><Link to="/inbox"><i className="fas fa-bell"></i> Inbox</Link></li>
-          <hr className="sidebar-divider" />
-          <li className="sidebar-section">
-            <div className="section-header" onClick={toggleProjects}>
-              <i className={`fas fa-chevron-${projectsExpanded ? 'down' : 'right'}`}></i>
-              <span>Projects</span>
-              <div className="section-actions">
-                <i className="fas fa-chevron-down" onClick={toggleProjectsDropdown}></i>
-                <i className="fas fa-plus" onClick={(e) => addProject(e)}></i>
-              </div>
-            </div>
-            {projectsDropdownOpen && (
-              <ul className="dropdown-menu">
-                <li onClick={(e) => addProject(e)}>Create new project</li>
-                <li className="sort-header">
-                  Sort Projects
-                  <ul className="sort-options">
-                    <li onClick={() => handleSortProjects('alphabetical')}>
-                      <span className="sort-checkbox">
-                        {projectsSortOption === 'alphabetical' && <i className="fas fa-check"></i>}
-                      </span>
-                      Alphabetical
-                    </li>
-                    <li onClick={() => handleSortProjects('recent')}>
-                      <span className="sort-checkbox">
-                        {projectsSortOption === 'recent' && <i className="fas fa-check"></i>}
-                      </span>
-                      Recent
-                    </li>
-                    <li onClick={() => handleSortProjects('top')}>
-                      <span className="sort-checkbox">
-                        {projectsSortOption === 'top' && <i className="fas fa-check"></i>}
-                      </span>
-                      Top
-                    </li>
-                  </ul>
-                </li>
-              </ul>
-            )}
-            {projectsExpanded && (
-              <ul className="sub-menu">
-                {projects.map(project => (
-                  <li key={project.id}>
-                    <i className="fas fa-circle" style={{color: getConsistentColor(project.id)}}></i>
-                    {project.name}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </li>
-          <li className="sidebar-section">
-            <div className="section-header" onClick={toggleWorkspaces}>
-              <i className={`fas fa-chevron-${workspacesExpanded ? 'down' : 'right'}`}></i>
-              <span>Workspaces</span>
-              <i className="fas fa-chevron-down" onClick={toggleWorkspacesDropdown}></i>
-            </div>
-            {workspacesDropdownOpen && (
-              <ul className="dropdown-menu">
-                <li onClick={(e) => addWorkspace(e)}>Create new workspace</li>
-                <li className="sort-header">
-                  Sort Workspaces
-                  <ul className="sort-options">
-                    <li onClick={() => handleSortWorkspaces('custom')}>
-                      <span className="sort-checkbox">
-                        {workspacesSortOption === 'custom' && <i className="fas fa-check"></i>}
-                      </span>
-                      Custom
-                    </li>
-                    <li onClick={() => handleSortWorkspaces('alphabetical')}>
-                      <span className="sort-checkbox">
-                        {workspacesSortOption === 'alphabetical' && <i className="fas fa-check"></i>}
-                      </span>
-                      Alphabetical
-                    </li>
-                  </ul>
-                </li>
-              </ul>
-            )}
-            {workspacesExpanded && (
-              <ul className="sub-menu">
-                {workspaces.map(workspace => (
-                  <li key={workspace.id}>
-                    <i className="fas fa-users"></i>
-                    {workspace.name}
-                    <i className="fas fa-chevron-right"></i>
-                  </li>
-                ))}
-                <li onClick={(e) => addWorkspace(e)}><i className="fas fa-plus"></i> Add Workspace</li>
-              </ul>
-            )}
-          </li>
+          <li><Link to="/inbox"><i className="fas fa-inbox"></i> Inbox</Link></li>
+          <li><Link to="/global-kanban"><i className="fas fa-columns"></i> Global Kanban</Link></li>
         </ul>
+
+        <div className="sidebar-section">
+          <h3>Favorites</h3>
+          <ul>
+            {favorites.map(fav => (
+              <li key={fav.id}>
+                <Link to={`/project/${fav.id}`}>
+                  <i className={`fas fa-${fav.icon}`}></i> {fav.name}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="sidebar-section">
+          <h3 onClick={toggleProjects}>
+            Projects
+            <i className={`fas fa-chevron-${projectsExpanded ? 'down' : 'right'}`}></i>
+          </h3>
+          {projectsExpanded && (
+            <ul>
+              {projects.map(project => (
+                <li key={project.id}>
+                  <Link to={`/project/${project.id}`}>
+                    <i className="fas fa-circle"></i> {project.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+          <button className="new-project-btn">
+            <i className="fas fa-plus"></i> New Project
+          </button>
+        </div>
+
+        <div className="sidebar-section">
+          <h3 onClick={toggleTeams}>
+            Teams
+            <i className={`fas fa-chevron-${teamsExpanded ? 'down' : 'right'}`}></i>
+          </h3>
+          {teamsExpanded && (
+            <ul>
+              {teams.map(team => (
+                <li key={team.id}>
+                  <Link to={`/team/${team.id}`}>
+                    <i className="fas fa-users"></i> {team.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </nav>
     </aside>
   );

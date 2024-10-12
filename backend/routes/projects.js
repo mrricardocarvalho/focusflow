@@ -90,4 +90,10 @@ router.delete('/:projectId/tasks/:taskId', (req, res) => {
     }
 });
 
+router.get('/tasks/multi-project', (req, res) => {
+    const { projectIds } = req.query;
+    const tasks = getTasksFromMultipleProjects(projectIds.split(','));
+    res.json(tasks);
+});
+
 module.exports = router;

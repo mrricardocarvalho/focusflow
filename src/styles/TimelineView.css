@@ -1,0 +1,44 @@
+.timeline-view {
+  padding: 20px;
+  overflow-x: auto;
+}
+
+.timeline-header {
+  display: flex;
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 10px;
+}
+
+.timeline-day {
+  width: 40px;
+  text-align: center;
+  font-size: 12px;
+}
+
+.month-label {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.timeline-body {
+  position: relative;
+  margin-top: 20px;
+  height: 300px;
+}
+
+.timeline-task {
+  position: absolute;
+  background-color: #e1f5fe;
+  border: 1px solid #b3e5fc;
+  border-radius: 4px;
+  padding: 5px;
+  font-size: 12px;
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.timeline-task:hover {
+  background-color: #b3e5fc;
+}
