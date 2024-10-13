@@ -1,0 +1,30 @@
+.project-selector {
+  display: inline-block;
+  margin-left: 15px;
+}
+
+.project-selector select {
+  appearance: none;
+  background-color: #f6f8f9;
+  border: 1px solid #e0e6e8;
+  border-radius: 4px;
+  color: #151b26;
+  font-size: 14px;
+  padding: 8px 30px 8px 10px;
+  width: 200px;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 14px;
+}
+
+.project-selector select:hover {
+  border-color: #b7bfc6;
+}
+
+.project-selector select:focus {
+  outline: none;
+  border-color: #796eff;
+  box-shadow: 0 0 0 2px rgba(121, 110, 255, 0.2);
+}

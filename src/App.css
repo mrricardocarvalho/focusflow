@@ -16,6 +16,7 @@ body, html {
 
 .app {
   display: flex;
+  flex-direction: column;
   height: 100vh;
 }
 
@@ -79,11 +80,10 @@ body, html {
 }
 
 
-.main-content {
-  flex-grow: 1;
+.main-container {
   display: flex;
-  flex-direction: column;
-  overflow-y: auto;
+  flex: 1;
+  overflow: hidden;
 }
 
 .header {
@@ -264,4 +264,10 @@ input[type="text"], input[type="date"], select {
 
 .sort-checkbox .fas.fa-check {
   color: #4CAF50;
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
 }

@@ -1,159 +1,191 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import TaskDetailView from './TaskDetailView';
+import { useProject } from '../contexts/ProjectContext';
+import { getTasks, createTask, updateTask, deleteTask } from '../services/api';
+import { FaFilter, FaSort, FaPlus, FaChevronDown, FaChevronRight } from 'react-icons/fa';
 import '../styles/ListView.css';
 
-function ListView({ tasks, updateTask }) {
+function ListView() {
+  const [tasks, setTasks] = useState([]);
+  const { currentProject } = useProject();
+  const [sections, setSections] = useState(['To Do', 'In Progress', 'Done']);
+  const [expandedSections, setExpandedSections] = useState({});
   const [newTaskName, setNewTaskName] = useState('');
-  const [filter, setFilter] = useState({ status: 'all', project: 'all' });
-  const [selectedTask, setSelectedTask] = useState(null);
+  const [editingTask, setEditingTask] = useState(null);
 
-  const toggleTaskCompletion = (taskId) => {
-    const task = tasks.find(t => t.id === taskId);
-    updateTask({ ...task, completed: !task.completed });
-  };
+  const fetchTasks = useCallback(async () => {
+    if (currentProject) {
+      try {
+        const response = await getTasks(currentProject._id);
+        setTasks(response.data);
+      } catch (error) {
+        console.error('Error fetching tasks:', error);
+      }
+    }
+  }, [currentProject]);
 
-  const handleNewTaskSubmit = (e) => {
-    e.preventDefault();
-    if (newTaskName.trim()) {
-      const newTask = {
-        id: Date.now(),
-        name: newTaskName,
-        assignee: '',
-        dueDate: '',
-        project: '',
-        completed: false,
-        description: '',
-        status: 'todo'
-      };
-      updateTask(newTask);
-      setNewTaskName('');
+  useEffect(() => {
+    fetchTasks();
+    setExpandedSections({
+      'To Do': true,
+      'In Progress': true,
+      'Done': true
+    });
+  }, [fetchTasks]);
+
+  const handleCreateTask = async (section) => {
+    if (newTaskName.trim() && currentProject) {
+      try {
+        await createTask({ name: newTaskName, projectId: currentProject._id, section });
+        setNewTaskName('');
+        fetchTasks();
+      } catch (error) {
+        console.error('Error creating task:', error);
+      }
     }
   };
 
-  const onDragEnd = (result) => {
-    if (!result.destination) {
-      return;
+  const handleUpdateTask = async (taskId, updates) => {
+    try {
+      await updateTask(taskId, updates);
+      fetchTasks();
+    } catch (error) {
+      console.error('Error updating task:', error);
     }
-
-    const items = Array.from(tasks);
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    items.splice(result.destination.index, 0, reorderedItem);
-
-    items.forEach((task, index) => {
-      updateTask({ ...task, order: index });
-    });
   };
 
-  const openTaskDetail = (task) => {
-    setSelectedTask(task);
+  const handleDeleteTask = async (taskId) => {
+    try {
+      await deleteTask(taskId);
+      fetchTasks();
+    } catch (error) {
+      console.error('Error deleting task:', error);
+    }
   };
 
-  const closeTaskDetail = () => {
-    setSelectedTask(null);
+  const onDragEnd = async (result) => {
+    if (!result.destination) return;
+
+    const { source, destination } = result;
+
+    if (source.droppableId !== destination.droppableId) {
+      // Moving between sections
+      const sourceSection = tasks.filter(task => task.section === source.droppableId);
+      const destSection = tasks.filter(task => task.section === destination.droppableId);
+      const [removed] = sourceSection.splice(source.index, 1);
+      destSection.splice(destination.index, 0, removed);
+
+      const newTasks = tasks.filter(task => task.section !== source.droppableId && task.section !== destination.droppableId)
+        .concat(sourceSection)
+        .concat(destSection);
+
+      setTasks(newTasks);
+
+      // Update task in backend
+      await updateTask(removed._id, { section: destination.droppableId });
+    } else {
+      // Reordering within the same section
+      const sectionTasks = tasks.filter(task => task.section === source.droppableId);
+      const [reorderedItem] = sectionTasks.splice(source.index, 1);
+      sectionTasks.splice(destination.index, 0, reorderedItem);
+
+      const newTasks = tasks.filter(task => task.section !== source.droppableId).concat(sectionTasks);
+      setTasks(newTasks);
+
+      // Update task order in backend
+      await updateTask(reorderedItem._id, { order: destination.index });
+    }
   };
 
-  const filteredTasks = useMemo(() => {
-    return tasks.filter(task => {
-      const statusMatch = filter.status === 'all' || 
-        (filter.status === 'completed' && task.completed) ||
-        (filter.status === 'active' && !task.completed);
-      const projectMatch = filter.project === 'all' || task.project === filter.project;
-      return statusMatch && projectMatch;
-    });
-  }, [tasks, filter]);
+  const toggleSection = (section) => {
+    setExpandedSections(prev => ({...prev, [section]: !prev[section]}));
+  };
 
-  const projects = useMemo(() => {
-    return ['all', ...new Set(tasks.map(task => task.project))];
-  }, [tasks]);
+  const addSection = () => {
+    const newSection = `New Section ${sections.length + 1}`;
+    setSections([...sections, newSection]);
+    setExpandedSections(prev => ({...prev, [newSection]: true}));
+  };
 
   return (
     <div className="list-view">
-      <div className="filters">
-        <select 
-          value={filter.status} 
-          onChange={(e) => setFilter({ ...filter, status: e.target.value })}
-        >
-          <option value="all">All tasks</option>
-          <option value="active">Active tasks</option>
-          <option value="completed">Completed tasks</option>
-        </select>
-        <select 
-          value={filter.project} 
-          onChange={(e) => setFilter({ ...filter, project: e.target.value })}
-        >
-          {projects.map(project => (
-            <option key={project} value={project}>
-              {project === 'all' ? 'All projects' : project}
-            </option>
-          ))}
-        </select>
+      <div className="list-header">
+        <button className="add-task-btn"><FaPlus /> Add Task</button>
+        <div className="list-controls">
+          <button><FaFilter /> Filter</button>
+          <button><FaSort /> Sort</button>
+        </div>
       </div>
-      <form onSubmit={handleNewTaskSubmit} className="new-task-form">
-        <input
-          type="text"
-          value={newTaskName}
-          onChange={(e) => setNewTaskName(e.target.value)}
-          placeholder="Add a new task..."
-          className="new-task-input"
-        />
-        <button type="submit" className="new-task-button">Add Task</button>
-      </form>
+      <div className="list-columns">
+        <div className="column">Task Name</div>
+        <div className="column">Assignee</div>
+        <div className="column">Due Date</div>
+        <div className="column">Priority</div>
+        <div className="column">Status</div>
+        <div className="column">Tags</div>
+        <div className="column"><FaPlus /></div>
+      </div>
       <DragDropContext onDragEnd={onDragEnd}>
-        <Droppable droppableId="tasks">
-          {(provided) => (
-            <table {...provided.droppableProps} ref={provided.innerRef}>
-              <thead>
-                <tr>
-                  <th></th>
-                  <th>Task name</th>
-                  <th>Assignee</th>
-                  <th>Due date</th>
-                  <th>Project</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredTasks.map((task, index) => (
-                  <Draggable key={task.id} draggableId={task.id.toString()} index={index}>
-                    {(provided) => (
-                      <tr
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                        className={task.completed ? 'completed' : ''}
-                        onClick={() => openTaskDetail(task)}
-                      >
-                        <td>
-                          <input 
-                            type="checkbox" 
-                            checked={task.completed} 
-                            onChange={(e) => {
-                              e.stopPropagation();
-                              toggleTaskCompletion(task.id);
-                            }}
-                          />
-                        </td>
-                        <td>{task.name}</td>
-                        <td>{task.assignee}</td>
-                        <td>{task.dueDate}</td>
-                        <td>{task.project}</td>
-                      </tr>
-                    )}
-                  </Draggable>
-                ))}
-                {provided.placeholder}
-              </tbody>
-            </table>
-          )}
-        </Droppable>
+        {sections.map((section) => (
+          <div key={section} className="task-section">
+            <div className="section-header" onClick={() => toggleSection(section)}>
+              {expandedSections[section] ? <FaChevronDown /> : <FaChevronRight />}
+              <h3>{section}</h3>
+            </div>
+            {expandedSections[section] && (
+              <Droppable droppableId={section}>
+                {(provided) => (
+                  <div {...provided.droppableProps} ref={provided.innerRef}>
+                    {tasks.filter(task => task.section === section).map((task, index) => (
+                      <Draggable key={task._id} draggableId={task._id} index={index}>
+                        {(provided) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            className="task-item"
+                          >
+                            <div className="column">{task.name}</div>
+                            <div className="column">{task.assignee}</div>
+                            <div className="column">{new Date(task.dueDate).toLocaleDateString()}</div>
+                            <div className="column">{task.priority}</div>
+                            <div className="column">{task.status}</div>
+                            <div className="column">{task.tags.join(', ')}</div>
+                            <div className="column"></div>
+                          </div>
+                        )}
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
+                    <div className="task-item new-task">
+                      <div className="column">
+                        <input
+                          type="text"
+                          value={newTaskName}
+                          onChange={(e) => setNewTaskName(e.target.value)}
+                          onKeyPress={(e) => {
+                            if (e.key === 'Enter') {
+                              handleCreateTask(section);
+                            }
+                          }}
+                          placeholder="Add task..."
+                        />
+                      </div>
+                      <div className="column"></div>
+                      <div className="column"></div>
+                      <div className="column"></div>
+                      <div className="column"></div>
+                      <div className="column"></div>
+                      <div className="column"></div>
+                    </div>
+                  </div>
+                )}
+              </Droppable>
+            )}
+          </div>
+        ))}
       </DragDropContext>
-      {selectedTask && (
-        <TaskDetailView
-          task={selectedTask}
-          onClose={closeTaskDetail}
-          onUpdate={updateTask}
-        />
-      )}
+      <button className="add-section-btn" onClick={addSection}><FaPlus /> Add Section</button>
     </div>
   );
 }

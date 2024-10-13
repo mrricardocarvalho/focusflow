@@ -1,35 +1,27 @@
 const express = require('express');
-const { createWorkspace, getWorkspaces, joinWorkspace } = require('../workspace');
-
 const router = express.Router();
 
-// Get All Workspaces
-router.get('/', (req, res) => {
-    const allWorkspaces = getWorkspaces();
-    res.json(allWorkspaces);
+// Get all users
+router.get('/', async (req, res) => {
+  try {
+    const db = req.app.locals.db;
+    const users = await db.collection('users').find().toArray();
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 });
 
-// Create Workspace
-router.post('/', (req, res) => {
-    const { name } = req.body;
-    // For now, let's use a dummy user since we haven't implemented authentication yet
-    const creator = 'dummyUser';
-    const newWorkspace = createWorkspace(name, creator);
-    res.status(201).json(newWorkspace);
-});
-
-// Join Workspace
-router.post('/join', (req, res) => {
-    const { workspaceId } = req.body;
-    // For now, let's use a dummy user since we haven't implemented authentication yet
-    const user = 'dummyUser';
-    const updatedWorkspace = joinWorkspace(workspaceId, user);
-    
-    if (updatedWorkspace) {
-        res.json(updatedWorkspace);
-    } else {
-        res.status(404).json({ message: 'Workspace not found or already joined' });
-    }
+// Create a new user
+router.post('/', async (req, res) => {
+  try {
+    const db = req.app.locals.db;
+    const newUser = req.body;
+    const result = await db.collection('users').insertOne(newUser);
+    res.status(201).json(result);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
 });
 
 module.exports = router;

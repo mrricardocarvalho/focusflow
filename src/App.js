@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import { ProjectProvider } from './contexts/ProjectContext';
 import Sidebar from './components/Sidebar';
 import TopNavBar from './components/TopNavBar';
 import ContentHeader from './components/ContentHeader';
@@ -7,50 +8,77 @@ import ListView from './components/ListView';
 import BoardView from './components/BoardView';
 import CalendarView from './components/CalendarView';
 import TimelineView from './components/TimelineView';
+import ProjectDetails from './components/ProjectDetails';
+import Login from './components/Login';
+import Signup from './components/Signup';
+import ForgotPassword from './components/ForgotPassword';
+import ResetPassword from './components/ResetPassword';
 import './App.css';
 
 function App() {
-  const [tasks, setTasks] = useState([
-    { id: 1, name: 'Design new landing page', assignee: 'John Doe', dueDate: '2023-06-15', project: 'Website Redesign', completed: false, description: '', status: 'todo' },
-    { id: 2, name: 'Update user documentation', assignee: 'Jane Smith', dueDate: '2023-06-20', project: 'Product Launch', completed: true, description: '', status: 'done' },
-    { id: 3, name: 'Prepare Q2 report', assignee: 'Mike Johnson', dueDate: '2023-06-30', project: 'Quarterly Reports', completed: false, description: '', status: 'inProgress' },
-  ]);
   const [viewMode, setViewMode] = useState('list');
-
-  const updateTask = (updatedTask) => {
-    setTasks(tasks.map(task => task.id === updatedTask.id ? updatedTask : task));
-  };
+  const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('token'));
 
   const renderView = () => {
     switch (viewMode) {
       case 'list':
-        return <ListView tasks={tasks} updateTask={updateTask} />;
+        return <ListView />;
       case 'board':
-        return <BoardView tasks={tasks} updateTask={updateTask} />;
+        return <BoardView />;
       case 'calendar':
-        return <CalendarView tasks={tasks} updateTask={updateTask} />;
+        return <CalendarView />;
       case 'timeline':
-        return <TimelineView tasks={tasks} updateTask={updateTask} />;
+        return <TimelineView />;
       default:
-        return <ListView tasks={tasks} updateTask={updateTask} />;
+        return <ListView />;
     }
+  };
+
+  const PrivateRoute = ({ children }) => {
+    return isAuthenticated ? children : <Navigate to="/login" />;
   };
 
   return (
     <Router>
-      <div className="app">
-        <Sidebar />
-        <div className="main-content">
-          <TopNavBar />
-          <ContentHeader 
-            viewMode={viewMode} 
-            setViewMode={setViewMode}
-          />
+      <ProjectProvider>
+        <div className="app">
           <Routes>
-            <Route path="/" element={renderView()} />
+            <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} />} />
+            <Route path="/signup" element={<Signup setIsAuthenticated={setIsAuthenticated} />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password/:token" element={<ResetPassword />} />
+            <Route
+              path="/"
+              element={
+                <PrivateRoute>
+                  <TopNavBar />
+                  <div className="main-container">
+                    <Sidebar />
+                    <div className="content">
+                      <ContentHeader viewMode={viewMode} setViewMode={setViewMode} />
+                      {renderView()}
+                    </div>
+                  </div>
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/project/:id"
+              element={
+                <PrivateRoute>
+                  <TopNavBar />
+                  <div className="main-container">
+                    <Sidebar />
+                    <div className="content">
+                      <ProjectDetails />
+                    </div>
+                  </div>
+                </PrivateRoute>
+              }
+            />
           </Routes>
         </div>
-      </div>
+      </ProjectProvider>
     </Router>
   );
 }

@@ -1,33 +1,56 @@
-// src/components/Register.js
 import React, { useState } from 'react';
-import axios from 'axios';
+import { register } from '../services/api';
 
 function Register() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [formData, setFormData] = useState({
+    username: '',
+    email: '',
+    password: '',
+  });
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
     try {
-      await axios.post('http://localhost:5000/api/users/register', { username, password });
-      alert('User registered successfully!');
-      setUsername('');
-      setPassword('');
+      const response = await register(formData);
+      localStorage.setItem('token', response.data.token);
+      // Redirect to dashboard or home page
     } catch (error) {
-      alert(error.response.data.message);
+      console.error('Registration failed:', error.response.data.message);
     }
   };
 
   return (
-    <div>
-      <h2>Register</h2>
-      <form onSubmit={handleSubmit}>
-        <input type="text" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} required />
-        <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-        <button type="submit">Register</button>
-      </form>
-    </div>
+    <form onSubmit={handleSubmit}>
+      <input
+        type="text"
+        name="username"
+        value={formData.username}
+        onChange={handleChange}
+        placeholder="Username"
+        required
+      />
+      <input
+        type="email"
+        name="email"
+        value={formData.email}
+        onChange={handleChange}
+        placeholder="Email"
+        required
+      />
+      <input
+        type="password"
+        name="password"
+        value={formData.password}
+        onChange={handleChange}
+        placeholder="Password"
+        required
+      />
+      <button type="submit">Register</button>
+    </form>
   );
 }
 

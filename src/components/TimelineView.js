@@ -1,26 +1,37 @@
 import React, { useState, useEffect } from 'react';
 import TaskDetailView from './TaskDetailView';
+import { getTasks, updateTask } from '../services/api';
 import '../styles/TimelineView.css';
 
-function TimelineView({ tasks, updateTask }) {
+function TimelineView() {
+  const [tasks, setTasks] = useState([]);
   const [timelineStart, setTimelineStart] = useState(new Date());
   const [timelineEnd, setTimelineEnd] = useState(new Date());
   const [selectedTask, setSelectedTask] = useState(null);
 
   useEffect(() => {
-    if (tasks.length > 0) {
-      const dates = tasks.map(task => new Date(task.dueDate));
-      const minDate = new Date(Math.min(...dates));
-      const maxDate = new Date(Math.max(...dates));
-      
-      setTimelineStart(new Date(minDate.getFullYear(), minDate.getMonth(), 1));
-      setTimelineEnd(new Date(maxDate.getFullYear(), maxDate.getMonth() + 1, 0));
+    fetchTasks();
+  }, []);
+
+  const fetchTasks = async () => {
+    try {
+      const response = await getTasks();
+      setTasks(response.data);
+
+      if (response.data.length > 0) {
+        // Set timeline start and end based on fetched tasks
+        const dates = response.data.map(task => new Date(task.dueDate));
+        setTimelineStart(new Date(Math.min(...dates)));
+        setTimelineEnd(new Date(Math.max(...dates)));
+      }
+    } catch (error) {
+      console.error('Error fetching tasks:', error);
     }
-  }, [tasks]);
+  };
 
   const getDaysArray = (start, end) => {
-    const arr = [];
-    for (let dt = new Date(start); dt <= end; dt.setDate(dt.getDate() + 1)) {
+    let arr = [];
+    for(let dt=new Date(start); dt<=end; dt.setDate(dt.getDate()+1)){
       arr.push(new Date(dt));
     }
     return arr;
@@ -32,6 +43,16 @@ function TimelineView({ tasks, updateTask }) {
 
   const closeTaskDetail = () => {
     setSelectedTask(null);
+  };
+
+  const handleTaskUpdate = async (updatedTask) => {
+    try {
+      await updateTask(updatedTask._id, updatedTask);
+      fetchTasks();
+      closeTaskDetail();
+    } catch (err) {
+      console.error('Error updating task:', err);
+    }
   };
 
   const daysArray = getDaysArray(timelineStart, timelineEnd);
@@ -60,7 +81,7 @@ function TimelineView({ tasks, updateTask }) {
           );
           return (
             <div 
-              key={task.id} 
+              key={task._id} 
               className="timeline-task"
               style={{ 
                 left: `${dayIndex * 40}px`,
@@ -77,7 +98,7 @@ function TimelineView({ tasks, updateTask }) {
         <TaskDetailView
           task={selectedTask}
           onClose={closeTaskDetail}
-          onUpdate={updateTask}
+          onUpdate={handleTaskUpdate}
         />
       )}
     </div>

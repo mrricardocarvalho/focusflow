@@ -1,20 +1,43 @@
 .sidebar {
   width: 240px;
-  background-color: #f6f8f9;
-  color: #151b26;
   height: 100vh;
+  background-color: #f6f8f9;
+  border-right: 1px solid #e0e6e8;
+  padding: 20px;
   overflow-y: auto;
-  padding-top: 20px;
 }
 
-.sidebar h1 {
-  font-size: 24px;
-  padding: 0 20px 20px;
+.sidebar h2 {
+  font-size: 20px;
+  margin-bottom: 20px;
   color: #151b26;
 }
 
-.sidebar-section {
-  padding: 10px 0;
+.sidebar nav ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.sidebar nav ul li {
+  margin-bottom: 10px;
+}
+
+.sidebar nav ul li a {
+  color: #6f7782;
+  text-decoration: none;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+}
+
+.sidebar nav ul li a i {
+  margin-right: 10px;
+  width: 20px;
+  text-align: center;
+}
+
+.sidebar nav ul li a:hover {
+  color: #151b26;
 }
 
 .sidebar-section h3 {
@@ -55,19 +78,84 @@
   text-align: center;
 }
 
-.new-project-btn {
-  display: block;
-  width: calc(100% - 40px);
-  margin: 10px 20px;
-  padding: 8px 12px;
-  background-color: #14aaf5;
-  color: white;
+.projects-section {
+  margin-top: 30px;
+}
+
+.projects-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.toggle-projects {
+  background: none;
   border: none;
-  border-radius: 4px;
+  color: #6f7782;
+  font-size: 14px;
   cursor: pointer;
-  text-align: center;
+  display: flex;
+  align-items: center;
+  padding: 0;
+}
+
+.toggle-projects:hover {
+  color: #151b26;
+}
+
+.toggle-projects i {
+  margin-right: 5px;
+}
+
+.toggle-projects h3 {
+  font-size: 14px;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.new-project-btn {
+  background-color: transparent;
+  border: none;
+  color: #6f7782;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
 }
 
 .new-project-btn:hover {
-  background-color: #008ce3;
+  background-color: #e0e6e8;
+  color: #151b26;
+}
+
+.projects-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.projects-list li {
+  margin-bottom: 5px;
+}
+
+.projects-list li a {
+  color: #6f7782;
+  text-decoration: none;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+}
+
+.projects-list li a i {
+  margin-right: 10px;
+  font-size: 10px;
+}
+
+.projects-list li a:hover {
+  color: #151b26;
 }

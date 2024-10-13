@@ -1,0 +1,23 @@
+.filter-sort {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.filter-options, .sort-options {
+  display: flex;
+  gap: 10px;
+}
+
+.filter-sort select {
+  padding: 5px 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: white;
+  font-size: 14px;
+}
+
+.filter-sort select:focus {
+  outline: none;
+  border-color: #0056b3;
+}

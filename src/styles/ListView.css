@@ -1,73 +1,104 @@
 .list-view {
   padding: 20px;
-  background-color: #ffffff;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-th, td {
-  text-align: left;
-  padding: 12px;
-  border-bottom: 1px solid #e0e0e0;
-}
-
-th {
-  background-color: #f6f8f9;
-  font-weight: 600;
-  color: #6f7782;
-}
-
-tr:hover {
   background-color: #f6f8f9;
 }
 
-tr.completed {
-  text-decoration: line-through;
-  color: #6f7782;
-}
-
-input[type="checkbox"] {
-  margin-right: 10px;
-}
-
-.new-task-form {
+.list-header {
   display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 20px;
 }
 
-.new-task-input {
-  flex-grow: 1;
-  padding: 10px;
-  font-size: 14px;
-  border: 1px solid #e0e0e0;
-  border-radius: 4px 0 0 4px;
-}
-
-.new-task-button {
-  padding: 10px 20px;
-  background-color: #14aaf5;
-  color: white;
-  border: none;
-  border-radius: 0 4px 4px 0;
-  cursor: pointer;
-}
-
-.new-task-button:hover {
-  background-color: #008ce3;
-}
-
-.filters {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 20px;
-}
-
-.filters select {
-  margin-left: 10px;
-  padding: 5px;
-  border: 1px solid #e0e0e0;
+.add-task-btn, .list-controls button {
+  background-color: #fff;
+  border: 1px solid #e0e6e8;
   border-radius: 4px;
+  padding: 8px 12px;
+  font-size: 14px;
+  color: #6f7782;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.add-task-btn svg, .list-controls button svg {
+  margin-right: 5px;
+}
+
+.list-controls {
+  display: flex;
+  gap: 10px;
+}
+
+.list-columns {
+  display: flex;
+  background-color: #fff;
+  border: 1px solid #e0e6e8;
+  border-radius: 4px 4px 0 0;
+  padding: 10px 0;
+  font-weight: bold;
+  color: #6f7782;
+}
+
+.column {
+  flex: 1;
+  padding: 0 10px;
+}
+
+.task-section {
+  margin-bottom: 20px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 10px;
+  background-color: #fff;
+  border: 1px solid #e0e6e8;
+  border-radius: 4px;
+}
+
+.section-header h3 {
+  margin-left: 10px;
+  font-size: 16px;
+  color: #151b26;
+}
+
+.task-item {
+  display: flex;
+  background-color: #fff;
+  border: 1px solid #e0e6e8;
+  border-top: none;
+  padding: 10px 0;
+}
+
+.task-item:last-child {
+  border-radius: 0 0 4px 4px;
+}
+
+.new-task input {
+  width: 100%;
+  border: none;
+  padding: 5px;
+  font-size: 14px;
+}
+
+.new-task input:focus {
+  outline: none;
+}
+
+.add-section-btn {
+  background-color: transparent;
+  border: none;
+  color: #6f7782;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+}
+
+.add-section-btn svg {
+  margin-right: 5px;
 }
